@@ -12,7 +12,10 @@ def create_app(config = Config):
     
     app.config.from_object(config)
         
-    # app.config["MAPBOX_ACCESS_TOKEN"] = os.environ.get("MAPBOX_TOKEN")
+    app.config["MAPBOX_ACCESS_TOKEN"] = os.environ.get("MAPBOX_ACCESS_TOKEN")
+    app.config["WEATHER_API_API_KEY"] = os.environ.get("WEATHER_API_API_KEY")
+    app.config["GEOLOCATED_API_KEY"] = os.environ.get("GEOLOCATED_API_KEY")
+    app.config["OPEN_WEATHER_MAP_API_KEY"] = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
     
     app.register_blueprint(index.bp)
     
