@@ -7,3 +7,7 @@ bp = Blueprint("index", __name__)
 def index():
     weather = callWeatherMap("Chihuahua","MX")
     return render_template("index.html", weather=weather)
+
+@bp.route("/mapa")
+def mapa():
+    return render_template("mapa.html")

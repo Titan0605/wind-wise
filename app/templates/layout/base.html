@@ -4,12 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <title>{%block title%}{%endblock%}</title>
+        <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .map-overlay {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            z-index: 1;
+        }
+        .legend {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 2px 0;
+        }
+        .legend-color {
+            width: 20px;
+            height: 10px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
     <header></header>
     <main>{%block body%}{%endblock%}</main>
     <footer></footer>
-    <script src="{{ url_for('static', filename='js/javascript.js') }}"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script>
+        // Configura tus claves de API
+        const mapboxToken = 'pk.eyJ1IjoiY2hyaXN0aWFuMDYwNSIsImEiOiJjbTgyNGwxcHQwcHd1MmtwaXFwM3d0bmJ0In0.0jfyr1BQLId2NjsfVX_jjg';
+        const owmApiKey = '2ada891d90a3ccdef40af5952a1e6bb0';
+        
+        // Inicializa el mapa
+        mapboxgl.accessToken = mapboxToken;
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [-74.5, 40], // Longitud, Latitud inicial
+            zoom: 3
+        });
+        
+        // Espera a que el mapa cargue
+        map.on('load', function() {
+            // Agrega la capa de OpenWeatherMap
+            map.addSource('openweathermap', {
+                'type': 'raster',
+                'tiles': [
+                    `https://maps.openweathermap.org/maps/2.0/weather/TA2/{z}/{x}/{y}?appid=${owmApiKey}`
+                ],
+                'tileSize': 256,
+                'attribution': '© OpenWeatherMap'
+            });
+            
+            map.addLayer({
+                'id': 'openweathermap-layer',
+                'type': 'raster',
+                'source': 'openweathermap',
+                'paint': {
+                    'raster-opacity': 0.8
+                }
+            });
+            
+            // Crear la leyenda
+            createLegend();
+        });
+        
+        // Función para crear la leyenda
+        function createLegend() {
+            const legend = document.getElementById('legend');
+            const temperatures = [
+                { temp: "-20°C", color: "#91caff" },
+                { temp: "-10°C", color: "#b9d9ff" },
+                { temp: "0°C", color: "#e6e6e6" },
+                { temp: "10°C", color: "#ffecb9" },
+                { temp: "20°C", color: "#ffc992" },
+                { temp: "30°C", color: "#ffa064" },
+                { temp: "40°C", color: "#ff6e4a" }
+            ];
+            
+            temperatures.forEach(item => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                const colorBlock = document.createElement('div');
+                colorBlock.className = 'legend-color';
+                colorBlock.style.backgroundColor = item.color;
+                
+                const text = document.createElement('span');
+                text.textContent = item.temp;
+                
+                legendItem.appendChild(colorBlock);
+                legendItem.appendChild(text);
+                legend.appendChild(legendItem);
+            });
+        }
+        
+        // Agregar controles de navegación
+        map.addControl(new mapboxgl.NavigationControl());
+        
+        // Agregar control de geolocalización
+        map.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true
+        }));
+    </script>
 </body>
 </html>
