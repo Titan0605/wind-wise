@@ -4,37 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <title>{%block title%}{%endblock%}</title>
-        <style>
-        body { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-        .map-overlay {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
-            z-index: 1;
-        }
-        .legend {
-            margin-top: 5px;
-            display: flex;
-            flex-direction: column;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin: 2px 0;
-        }
-        .legend-color {
-            width: 20px;
-            height: 10px;
-            margin-right: 5px;
-        }
-    </style>
 </head>
 <body>
     <header></header>
@@ -42,89 +14,6 @@
     <footer></footer>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-    <script>
-    // Configura tus claves de API
-    const mapboxToken = 'pk.eyJ1IjoiY2hyaXN0aWFuMDYwNSIsImEiOiJjbTgyNGwxcHQwcHd1MmtwaXFwM3d0bmJ0In0.0jfyr1BQLId2NjsfVX_jjg';
-    const owmApiKey = '2ada891d90a3ccdef40af5952a1e6bb0';
-    
-    // Variable para almacenar la capa actual
-    let currentLayer = 'temp_new';
-    
-    // Inicializa el mapa
-    mapboxgl.accessToken = mapboxToken;
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [-106.077, 28.636], // Ciudad de México por defecto
-        zoom: 10
-    });
-    
-    // Función para añadir capa meteorológica
-    function addWeatherLayer(layerType) {
-        // Eliminar capa anterior si existe
-        if (map.getSource('openweathermap')) {
-            map.removeLayer('openweathermap-layer');
-            map.removeSource('openweathermap');
-        }
-        
-        // Añadir nueva capa
-        map.addSource('openweathermap', {
-            'type': 'raster',
-            'tiles': [
-                `https://tile.openweathermap.org/map/${layerType}/{z}/{x}/{y}.png?appid=${owmApiKey}`
-            ],
-            'tileSize': 256,
-            'attribution': '© OpenWeatherMap'
-        });
-        
-        map.addLayer({
-            'id': 'openweathermap-layer',
-            'type': 'raster',
-            'source': 'openweathermap',
-            'paint': {
-                'raster-opacity': 0.8
-            }
-        });
-    }
-    
-    // Cuando el mapa cargue
-    map.on('load', function() {
-        // Agregar capa inicial (temperatura)
-        addWeatherLayer(currentLayer);
-        
-        // Detectar cambios en el selector de capas
-        document.getElementById('layer-select').addEventListener('change', function(e) {
-            currentLayer = e.target.value;
-            addWeatherLayer(currentLayer);
-        });
-    });
-    
-    // Agregar controles de navegación
-    map.addControl(new mapboxgl.NavigationControl());
-    
-    // Agregar control de geolocalización
-    map.addControl(new mapboxgl.GeolocateControl({
-        positionOptions: {
-            enableHighAccuracy: true
-        },
-        trackUserLocation: true,
-        showUserHeading: true
-    }));
-    
-    // Intentar geolocalizar al usuario al cargar
-    map.on('load', () => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                map.flyTo({
-                    center: [position.coords.longitude, position.coords.latitude],
-                    zoom: 8
-                });
-            },
-            (error) => {
-                console.log('Error obteniendo la geolocalización:', error);
-            }
-        );
-    });
-</script>
+    <script src="{{ url_for('static', filename='js/showmap.js') }}"></script>
 </body>
 </html>

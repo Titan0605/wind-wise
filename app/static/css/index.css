@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+.map-overlay {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+  z-index: 1;
+}
+.legend {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+}
+.legend-color {
+  width: 20px;
+  height: 10px;
+  margin-right: 5px;
+}
