@@ -4,8 +4,28 @@
 
 {%block body%}
     <div>
-        <p>
-            {{ weather }}
-        </p>
+        <form id="city_form">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" value="" required>
+            <label for="country">Country</label>
+            <input type="text" id="country" name="country" value="" required>
+            <button type="submit" class="btnSubmit"  style="background-color: #000000; color: #ffffff;">Buscar</button>
+        </form>
+    </div>
+
+    <div class="p-4">
+        <div id="map"></div>
+        
+        <!-- Selector de capas -->
+        <div class="layer-selection">
+        <h3>Selecciona capa meteorológica:</h3>
+        <select id="layer-select">
+            <option value="temp_new">Temperatura</option>
+            <option value="precipitation_new">Precipitación</option>
+            <option value="clouds_new">Nubes</option>
+            <option value="pressure_new">Presión</option>
+            <option value="wind_new">Viento</option>
+        </select>
+        </div>
     </div>
 {%endblock%}

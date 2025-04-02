@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <title>{%block title%}{%endblock%}</title>
 </head>
 <body>
     <header></header>
     <main>{%block body%}{%endblock%}</main>
     <footer></footer>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/showmap.js') }}"></script>
 </body>
 </html>
