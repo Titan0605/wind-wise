@@ -13,10 +13,10 @@ def callWeatherMap(city, country):
 
     return weatherMap # Return the JSON
 
-def callWeatherApi(city):
+def callWeatherApi(lat, lon):
     """ Function to make a call to WeatherApi """
     # We call the API and insert the info city, country and the API KEY from the config
-    response = requests.get(f"https://api.weatherapi.com/v1/current.json?key={current_app.config["WEATHER_API_API_KEY"]}&q={city}&aqi=no")
+    response = requests.get(f"https://api.weatherapi.com/v1/forecast.json?key={current_app.config['WEATHER_API_API_KEY']}&q={lat},{lon}&days=8&aqi=no&alerts=yes")
     response.raise_for_status() # This is for in case something happens it will give us the status code
 
     weatherApi = response.json() # This converts the response in JSON

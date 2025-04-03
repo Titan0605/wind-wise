@@ -17,9 +17,6 @@
                     <i class="fa-solid fa-sun mr-2 mt-1 text-2xl"></i>
                     <h1 class="text-2xl font-bold">Wind Wise</h1>
                 </a>
-                <div>
-                    <a href="/mapa" class="text-white hover:text-blue-200 transition">Dashboard</a>
-                </div>
             </div>
         </div>
     </header>
@@ -30,7 +27,7 @@
     
     <footer class="bg-gray-800 text-white py-4">
         <div class="container mx-auto px-4 text-center">
-            <p>&copy; 2025 WeatherMap. Todos los derechos reservados.</p>
+            <p>&copy; 2025 WindWise. All rights reserved.</p>
             <div class="mt-2 text-sm text-gray-400">
             </div>
         </div>
@@ -39,5 +36,6 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     <script src="{{ url_for('static', filename='js/showmap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/weatherDashboard.js') }}"></script>
 </body>
 </html>

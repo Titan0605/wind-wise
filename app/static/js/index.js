@@ -1,53 +1,86 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('city_form').addEventListener('submit', async function(e) {
-        e.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
+	// When the DOM is loaded it will do the code
+	fetch("https://api.ipify.org?format=json") // Call an API to get the user's IP
+		.then(response => response.json())
+		.then(data => {
+			const userIP = data.ip;
+			console.log("IP del usuario:", userIP); // Show the IP for debug
 
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
+			// Enviar la IP al backend de Flask
+			fetch("/get-location", {
+				// Fetch the location based on the user's IP, with a Flask route
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ ip: userIP }), // We send the IP
+			})
+				.then(response => response.json())
+				.then(locationData => {
+					console.log("Datos de ubicación:", locationData); // Show the location data for debug
 
-        const city = data.city; // Asumiendo que tienes un campo state en tu formulario
-        const country = data.country;
+					var fixedcity = locationData.cityName.split(" ("); // We split the city's name in two to show it correctly
+					console.log(fixedcity); // Show the city for debug
 
-        fetch(`/search_weather/${city}/${country}`, {
-            method: "GET"
-        }).then(response => response.json())
-        .then(data => {
-            console.log(JSON.stringify(data));
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-    fetch("https://api.ipify.org?format=json")
-      .then((response) => response.json())
-      .then((data) => {
-        const userIP = data.ip;
-        console.log("IP del usuario:", userIP);
+					getCoordinates(fixedcity[0], locationData.countryCode);
 
-        // Enviar la IP al backend de Flask
-        fetch("/get-location", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ip: userIP }),
-        })
-          .then((response) => response.json())
-          .then((locationData) => {
-            console.log("Datos de ubicación:", locationData);
+					if (document.getElementById("city") && document.getElementById("country")) {
+						document.getElementById("city").value = fixedcity[0];
+						document.getElementById("country").value = locationData.countryCode;
+					}
 
-            var fixedcity = locationData.cityName.split(" (");
-            console.log(fixedcity);
+					document.getElementById("lat").value = locationData.latitude;
+					document.getElementById("lon").value = locationData.longitude;
+					console.log("Latitud:", locationData.latitude, "Longitud:", locationData.longitude);
+				})
+				.catch(error => {
+					console.error("Error al obtener la ubicación:", error); // In case an error occurs, it will show the error
+				});
+		})
+		.catch(error => {
+			console.error("Error al obtener la IP:", error); // In case we can't get the IP it will show an error
+		});
 
-            document.getElementById('city').value = fixedcity[0];
-            document.getElementById('country').value = locationData.countryCode;
-            
-          })
-          .catch((error) => {
-            console.error("Error al obtener la ubicación:", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error al obtener la IP:", error);
-      });
+	document.getElementById("city_form").addEventListener("submit", async function (e) {
+		// Function to execute when the submit is done
+		e.preventDefault();
+
+		var formData = new FormData(e.target);
+		var data = Object.fromEntries(formData);
+
+		console.log(data);
+
+		var city = data.city;
+		var country = data.country;
+
+		var location = await getCoordinates(city, country);
+
+		console.log(location);
+
+		console.log(location.coord.lat);
+
+		document.getElementById("lat").value = location.coord.lat;
+		document.getElementById("lon").value = location.coord.lon;
+
+    initializeMap();
+		loadWeatherData(location.coord.lat, location.coord.lon);
+
+		document.getElementById("weather-dashboard").style.display = "block";
+		document.getElementById("map-container").style.display = "block";
+    document.getElementById("error-message").style.display = "none";
+	});
 });
+
+async function getCoordinates(city, country) {
+	try {
+		const response = await fetch(`/search_weather_WM/${city}/${country}`);
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error("Error al obtener las coordenadas", error);
+    document.getElementById("weather-dashboard").style.display = "none";
+		document.getElementById("map-container").style.display = "none";
+    document.getElementById("error-message").style.display = "block";
+		return null;
+	}
+}
