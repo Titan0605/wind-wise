@@ -2,7 +2,7 @@ import os
 from flask import Flask
 # from mapkick.flask import mapkick_blueprint
 from config import Config
-from app.routes import index
+from app.routes import index, search_weather, getAPIs
 from dotenv import load_dotenv
 
 def create_app(config = Config):
@@ -18,5 +18,7 @@ def create_app(config = Config):
     app.config["OPEN_WEATHER_MAP_API_KEY"] = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
     
     app.register_blueprint(index.bp)
+    app.register_blueprint(search_weather.bp)
+    app.register_blueprint(getAPIs.bp)
     
     return app
