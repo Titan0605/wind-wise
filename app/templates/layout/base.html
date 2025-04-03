@@ -1,19 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <title>{%block title%}{%endblock%}</title>
 </head>
-<body>
-    <header></header>
-    <main>{%block body%}{%endblock%}</main>
-    <footer></footer>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-md">
+        <div class="container mx-auto px-3 py-4">
+            <div class="flex justify-between items-center">
+                <a class="flex items-center justify-center" href="/">
+                    <i class="fa-solid fa-sun mr-2 mt-1 text-2xl"></i>
+                    <h1 class="text-2xl font-bold">Wind Wise</h1>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {%block body%}{%endblock%}
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 WindWise. All rights reserved.</p>
+            <div class="mt-2 text-sm text-gray-400">
+            </div>
+        </div>
+    </footer>
+    
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     <script src="{{ url_for('static', filename='js/showmap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/weatherDashboard.js') }}"></script>
 </body>
 </html>

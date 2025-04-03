@@ -1,123 +1,106 @@
-// Función para obtener la clave API
-async function getWeatherApiKey(apiwanted) {
-  try {
-    const response = await fetch(`/api/${apiwanted}`);
-    const data = await response.json();
-    console.log(`${apiwanted} API Key obtenida`);
-    return data.token;
-  } catch (error) {
-    console.error(`Error al obtener la clave de API ${apiwanted}:`, error);
-    return null;
-  }
+async function getApiKey(apiwanted) {
+	// Function to get an API key from the Backend
+	try {
+		const response = await fetch(`/api/${apiwanted}`); // We specify the API Key we want
+		const data = await response.json();
+		console.log(`${apiwanted} API Key obtenida`);
+		return data.token;
+	} catch (error) {
+		console.error(`Error al obtener la clave de API ${apiwanted}:`, error);
+		return null;
+	}
 }
 
-// Función principal para inicializar todo
 async function initializeMap() {
-  try {
-    // Primero obtenemos el token de MapBox
-    const mapboxToken = await getWeatherApiKey("MapBoxGL");
-    if (!mapboxToken) {
-      throw new Error("No se pudo obtener el token de MapBox");
-    }
+	// Function to initialize the map from MapBoxGL API
+	try {
+		// Primero obtenemos el token de MapBox
+		const mapboxToken = await getApiKey("MapBoxGL"); // First we get the API key of MapBoxGL
+		if (!mapboxToken) {
+			throw new Error("No se pudo obtener el token de MapBox");
+		}
 
-    // Establecemos el token antes de crear el mapa
-    mapboxgl.accessToken = mapboxToken;
+		mapboxgl.accessToken = mapboxToken; // We set the accesToken with API key we get before
 
-    // Ahora creamos el mapa
-    const map = new mapboxgl.Map({
-      container: "map",
-      style: "mapbox://styles/mapbox/light-v11",
-      center: [-106.077, 28.636],
-      zoom: 10,
-    });
+    var userLat = document.getElementById("lat").value
+    var userLon = document.getElementById("lon").value
 
-    // Variable para almacenar la capa actual
-    let currentLayer = "temp_new";
+    console.log("User Latitude:", userLat, "User Longitude:", userLon)
 
-    // Función para añadir capa meteorológica
-    async function addWeatherLayer(layerType) {
-      // Esperar a que el mapa esté cargado
-      if (!map.loaded()) {
-        await new Promise((resolve) => {
-          map.once("load", resolve);
-        });
-      }
+		const map = new mapboxgl.Map({
+			// Now we create a map object for Mapbox
+			container: "map",
+			style: "mapbox://styles/mapbox/light-v11",
+			center: [userLon, userLat],
+			zoom: 8,
+		});
 
-      // Eliminar capa anterior si existe
-      if (map.getSource("openweathermap")) {
-        map.removeLayer("openweathermap-layer");
-        map.removeSource("openweathermap");
-      }
+		let currentLayer = "temp_new"; // Variable to save the actual layer of the map (Temperature as default)
 
-      // Obtener la clave API antes de continuar
-      const apiKey = await getWeatherApiKey("OpenWeatherMap");
-      if (!apiKey) {
-        console.error("No se pudo obtener la clave API de OpenWeatherMap");
-        return;
-      }
+		async function addWeatherLayer(layerType) {
+			// Function to update the layer of the map
+			if (!map.loaded()) {
+				// Function to wait until the map is loaded
+				await new Promise(resolve => {
+					map.once("load", resolve);
+				});
+			}
 
-      // Añadir nueva capa
-      map.addSource("openweathermap", {
-        type: "raster",
-        tiles: [`https://tile.openweathermap.org/map/${layerType}/{z}/{x}/{y}.png?appid=${apiKey}`],
-        tileSize: 256,
-        attribution: "© OpenWeatherMap",
-      });
+			if (map.getSource("openweathermap")) {
+				// This delete the layer if it exists
+				map.removeLayer("openweathermap-layer");
+				map.removeSource("openweathermap");
+			}
 
-      map.addLayer({
-        id: "openweathermap-layer",
-        type: "raster",
-        source: "openweathermap",
-        paint: {
-          "raster-opacity": 0.8,
-        },
-      });
-    }
+			const apiKey = await getApiKey("OpenWeatherMap"); // We obtain the API key for OpenWeatherMap
+			if (!apiKey) {
+				console.error("No se pudo obtener la clave API de OpenWeatherMap");
+				return;
+			}
 
-    // Unificamos la lógica de carga en un solo manejador
-    map.on("load", async function () {
-      // Agregar controles de navegación
-      map.addControl(new mapboxgl.NavigationControl());
+			map.addSource("openweathermap", {
+				// We add a new source for OpenWeatherMap, where we change the layer we want
+				type: "raster",
+				tiles: [`https://tile.openweathermap.org/map/${layerType}/{z}/{x}/{y}.png?appid=${apiKey}`],
+				tileSize: 256,
+				attribution: "© OpenWeatherMap",
+			});
 
-      // Agregar control de geolocalización
-      map.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true,
-          },
-          trackUserLocation: true,
-          showUserHeading: true,
-        })
-      );
+			map.addLayer({
+				// We add the layer with the source we add before
+				id: "openweathermap-layer",
+				type: "raster",
+				source: "openweathermap",
+				paint: {
+					"raster-opacity": 0.8,
+				},
+			});
+		}
 
-      // Intentar geolocalizar al usuario
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          map.flyTo({
-            center: [position.coords.longitude, position.coords.latitude],
-            zoom: 8,
-          });
-        },
-        (error) => {
-          console.log("Error obteniendo la geolocalización:", error);
-        }
-      );
+		map.on("load", async function () {
+			map.addControl(new mapboxgl.NavigationControl()); // This add navigation controls
 
-      // Agregar capa inicial (temperatura)
-      await addWeatherLayer(currentLayer);
+			map.addControl( // This adds the option to geolocate the user
+				new mapboxgl.GeolocateControl({
+					positionOptions: {
+						enableHighAccuracy: true,
+					},
+					trackUserLocation: true,
+					showUserHeading: true,
+				})
+			);
 
-      // Detectar cambios en el selector de capas
-      document.getElementById("layer-select").addEventListener("change", function (e) {
-        currentLayer = e.target.value;
-        addWeatherLayer(currentLayer);
-      });
-    });
-  } catch (error) {
-    console.error("Error al inicializar el mapa:", error);
-    // Mostrar mensaje al usuario
-    document.getElementById("map").innerHTML = `<div style="padding: 20px; color: red;">Error al cargar el mapa: ${error.message}</div>`;
-  }
+			await addWeatherLayer(currentLayer); // This adds the current layer to the map
+
+			// Detectar cambios en el selector de capas
+			document.getElementById("layer-select").addEventListener("change", function (e) {
+				currentLayer = e.target.value;
+				addWeatherLayer(currentLayer);
+			});
+		});
+	} catch (error) {
+		console.error("Error al inicializar el mapa:", error);
+		// Shows an error if the map didn't load
+		document.getElementById("map").innerHTML = `<div class="p-5 text-red-600">Error al cargar el mapa: ${error.message}</div>`;
+	}
 }
-
-// Iniciar todo el proceso cuando el DOM esté listo
-document.addEventListener("DOMContentLoaded", initializeMap);
