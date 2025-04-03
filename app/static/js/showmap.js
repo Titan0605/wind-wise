@@ -14,21 +14,21 @@ async function getApiKey(apiwanted) {
 async function initializeMap() {
 	// Function to initialize the map from MapBoxGL API
 	try {
-		// Primero obtenemos el token de MapBox
-		const mapboxToken = await getApiKey("MapBoxGL"); // First we get the API key of MapBoxGL
+		// we get the api key of MapBox
+		const mapboxToken = await getApiKey("MapBoxGL"); 
 		if (!mapboxToken) {
 			throw new Error("No se pudo obtener el token de MapBox");
 		}
 
 		mapboxgl.accessToken = mapboxToken; // We set the accesToken with API key we get before
-
+	// we get the lat and lon
     var userLat = document.getElementById("lat").value
     var userLon = document.getElementById("lon").value
 
-    console.log("User Latitude:", userLat, "User Longitude:", userLon)
+    console.log("User Latitude:", userLat, "User Longitude:", userLon) //print for debug
 
 		const map = new mapboxgl.Map({
-			// Now we create a map object for Mapbox
+			// we create a map object for Mapbox
 			container: "map",
 			style: "mapbox://styles/mapbox/light-v11",
 			center: [userLon, userLat],

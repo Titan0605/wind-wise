@@ -1,8 +1,8 @@
-from flask import render_template, Blueprint, current_app, jsonify
-from app.services.callApis import callWeatherMap
+from flask import Blueprint, current_app, jsonify
 
 bp = Blueprint("apis", __name__)
 
+# recieves the name of the api like parameter and if match with one, it returs the api key
 @bp.route("/api/<string:nameAPI>")
 def getApibyName(nameAPI):
     match nameAPI:

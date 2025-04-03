@@ -1,12 +1,14 @@
 // Función para cargar datos del clima
 async function loadWeatherData(userLat, userLon) {
 	try {
+		// makes a call to the API and is saved in response
 		const response = await fetch(`/search_weather_WA/${userLat}/${userLon}`);
 		if (!response.ok) {
 			throw new Error("No se pudo obtener la información del clima");
 		}
+		// converts the response in JSON format and is saved in data
 		const data = await response.json();
-		console.log(data);
+		console.log(data); // print for debug
 		displayWeatherData(data);
 	} catch (error) {
 		console.error("Error:", error);
@@ -15,13 +17,12 @@ async function loadWeatherData(userLat, userLon) {
 }
 
 function displayWeatherData(data) {
+	// we filled all the information provided by the api
 	document.getElementById("location-info").textContent = `${data.location.name}, ${data.location.country}`;
-
 	document.getElementById("current-temp").textContent = `${Math.round(data.current.temp_c)}°C`;
 	document.getElementById("current-condition").textContent = data.current.condition.text;
 	document.getElementById("current-icon").src = data.current.condition.icon;
 	document.getElementById("last-updated").textContent = `Updated: ${formatTime(data.current.last_updated)}`;
-
 	document.getElementById("feels-like").textContent = `${Math.round(data.current.feelslike_c)}°C`;
 	document.getElementById("humidity").textContent = `${data.current.humidity}%`;
 	document.getElementById("wind").textContent = `${data.current.wind_kph} km/h`;
@@ -36,7 +37,7 @@ function displayWeatherData(data) {
 	const nextHours = hours.slice(currentHour, currentHour + 24);
 
 	console.log(nextHours);
-
+	// shows the data in each hour
 	nextHours.forEach(hour => {
 		const date = new Date(hour.time);
 		const hourCard = document.createElement("div");
